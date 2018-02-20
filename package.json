@@ -2,6 +2,12 @@
   "name": "cordova-plugin-scanner",
   "version": "0.0.1",
   "description": "cordova-plugin-scanner",
+  "cordova" : {
+    "id": "cordova-plugin-scanner",
+    "platforms": [
+      "ios"
+    ]
+  },
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
