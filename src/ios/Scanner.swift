@@ -10,14 +10,26 @@ import Foundation
 
     func scan(_ command: CDVInvokedUrlCommand) {
 
-        let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: "OK")
-
+        // 引数で何か渡されたら。
+        var someArg = command.argument(at: 0);
+        
+        if (someArg != nil) {
+            someArg = (someArg! as! String) + "+cordova!"
+        }
+        else {
+            someArg = "OK"
+        }
+        
+        // 結果を生成
+        let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: someArg as! String)
+        
         // エラーを送る場合
         // let result = CDVPluginResult(status: CDVCommandStatus_Error, messageAs: "Error")
 
         // 文字列以外も送れます
-        // let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: self.getSomeDict())
+        //  let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: self.getSomeDict())
 
+        // 結果を送る
         self.commandDelegate.send(result, callbackId: command.callbackId)
     }
 
