@@ -2,14 +2,13 @@ import Foundation
 
 @objc(Scanner) class Scanner: CDVPlugin {
 
-
     // 最初に呼ばれます
     override func pluginInitialize() {
     }
 
 
     func scan(_ command: CDVInvokedUrlCommand) {
-
+        
         // 引数で何か渡されたら。
         var someArg = command.argument(at: 0);
         
@@ -21,7 +20,7 @@ import Foundation
         }
         
         // 結果を生成
-        let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: someArg as! String)
+        let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: OpenCVWrapper.openCVVersionString() as! String)
         
         // エラーを送る場合
         // let result = CDVPluginResult(status: CDVCommandStatus_Error, messageAs: "Error")

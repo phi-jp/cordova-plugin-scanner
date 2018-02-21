@@ -1,11 +1,20 @@
 # cordova-plugin-scanner
 
+## setup cocoapod
+
+```
+$ sudo gem update —system
+$ sudo gem install cocoapods
+$ pod setup
+```
+
 ## test
 
 ```
 $ cd test
 $ cordova platform add ios --nosave --nofetch
-$ cordova plugin add --link ../
+$ cordova plugin add --link ../ --nosave
+$ cordova prepare ios
 $ cordova build ios
 $ cordova emulate ios
 ```
@@ -24,3 +33,5 @@ Scanner.scan(function(data) {
 }, 'params');
 
 ```
+
+scanを押すととりあえずopencvのバージョンが出てきます

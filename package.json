@@ -2,7 +2,7 @@
   "name": "cordova-plugin-scanner",
   "version": "0.0.1",
   "description": "cordova-plugin-scanner",
-  "cordova" : {
+  "cordova": {
     "id": "cordova-plugin-scanner",
     "platforms": [
       "ios"

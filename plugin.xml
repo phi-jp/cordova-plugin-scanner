@@ -17,8 +17,13 @@
 
     <source-file src="src/ios/Scanner.swift" />
     <source-file src="src/ios/Scanner-Bridging-Header.h" />
-
+    <source-file src="src/ios/PrefixHeaderForScanner.pch" />
+    <header-file src="src/ios/OpenCVWrapper.h" />
+    <source-file src="src/ios/OpenCVWrapper.mm" />
     <dependency id="cordova-plugin-add-swift-support" version="1.7.1"/>
     <preference name="UseSwiftLanguageVersion" default="4" />
+
+    <framework src="OpenCV2" type="podspec" spec="3.4.0"/>
   </platform>
+  <dependency id='cordova-custom-config' version='5.0.2' />
 </plugin>
