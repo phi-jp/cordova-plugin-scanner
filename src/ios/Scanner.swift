@@ -4,12 +4,9 @@ import Foundation
     var avCapture: AVCapture! = nil
     var openCv: OpenCv! = nil
     var base64 = ""
-    
+    var capturedImage: UIImage! = nil
     func capture(image: UIImage) {
-        print("CAPTURE")
-        let filteredImage = openCv.filter(image)
-        let datas:NSData = UIImagePNGRepresentation(filteredImage!)! as NSData
-        base64 = datas.base64EncodedString()
+        capturedImage = image
     }
     
     // 最初に呼ばれます
@@ -34,7 +31,10 @@ import Foundation
     }
     func scan(_ command: CDVInvokedUrlCommand) {
         print("SCAN!")
-        print(base64)
+        
+        let filteredImage = capturedImage//openCv.filter(capturedImage)
+        let datas:NSData = UIImageJPEGRepresentation(filteredImage!, 0.5)! as NSData
+        base64 = "data:image/jpeg;base64," + datas.base64EncodedString()
         // 引数で何か渡されたら。
         var someArg = command.argument(at: 0);
         

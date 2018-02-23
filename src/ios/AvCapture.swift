@@ -54,11 +54,11 @@ class AVCapture:NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     
     // 新しいキャプチャの追加で呼ばれる(1/30秒に１回)
     func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
-        if (counter % 5) == 0 {
+//        if (counter % 5) == 0 {
             let image = imageFromSampleBuffer(sampleBuffer: sampleBuffer)
             delegate?.capture(image: image)
-        }
-        counter += 1
+//        }
+//        counter += 1
     }
     
     func imageFromSampleBuffer(sampleBuffer :CMSampleBuffer) -> UIImage {

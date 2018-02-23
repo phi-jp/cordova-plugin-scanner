@@ -20,6 +20,12 @@ $ cordova build ios
 $ cordova emulate ios
 ```
 
+## メモ
+
+### 初期化、構築、XCodeを開くを一発でやる
+
+`rm -rf platforms/ plugins/ node_modules/ && cordova platform add ios --nosave --nofetch && cordova plugin add --link ../ --nosave && cordova prepare ios && open platforms/ios/cordova-plugin-scanner-test.xcworkspace`
+
 ## 今できること
 現状では、`test/www/js/index.js`に記載されているコードのような感じで動くのみとなります.
 
