@@ -13,7 +13,8 @@ $ pod setup
 ```
 $ cd test
 $ cordova platform add ios --nosave --nofetch
-$ cordova plugin add --link ../ --nosave
+// variable をオプションをつけなくてもデフォルトの文言入ります。
+$ cordova plugin add --link ../ --nosave --variable CAMERA_USAGE_DESCRIPTION='カメラを有効にします'
 $ cordova prepare ios
 $ cordova build ios
 $ cordova emulate ios
