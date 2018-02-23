@@ -14,12 +14,15 @@
         <param name="ios-package" value="Scanner" />
       </feature>
     </config-file>
-
-    <source-file src="src/ios/Scanner.swift" />
-    <source-file src="src/ios/Scanner-Bridging-Header.h" />
-    <source-file src="src/ios/PrefixHeaderForScanner.pch" />
+    
+    <source-file src="src/ios/AvCapture.swift" />
+    <header-file src="src/ios/Camera-Bridging-Header.h" />
+    <source-file src="src/ios/OpenCv.mm" />
     <header-file src="src/ios/OpenCVWrapper.h" />
     <source-file src="src/ios/OpenCVWrapper.mm" />
+    <source-file src="src/ios/PrefixHeaderForScanner.pch" />
+    <header-file src="src/ios/Scanner-Bridging-Header.h" />
+    <source-file src="src/ios/Scanner.swift" />
     <dependency id="cordova-plugin-add-swift-support" version="1.7.1"/>
     <preference name="UseSwiftLanguageVersion" default="4" />
 
