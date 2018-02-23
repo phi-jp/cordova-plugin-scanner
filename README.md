@@ -14,7 +14,6 @@ $ pod setup
 $ cd test
 $ cordova platform add ios --nosave --nofetch
 $ cordova plugin add --link ../ --nosave
-$ cordova prepare ios
 $ cordova build ios
 $ cordova emulate ios
 ```
