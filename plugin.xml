@@ -6,6 +6,7 @@
     <clobbers target="scanner" />
   </js-module>
 
+  <preference name="CAMERA_USAGE_DESCRIPTION" default="You have to give the permission which this service use the camera" />
   <!-- iOS -->
   <platform name="ios">
     <config-file target="config.xml" parent="/*">
@@ -15,11 +16,16 @@
       </feature>
     </config-file>
 
+    <edit-config target="Privacy - Camera Usage Description" file="*-Info.plist" mode="merge">
+      <string>$CAMERA_USAGE_DESCRIPTION</string>
+    </edit-config>
+
     <source-file src="src/ios/Scanner.swift" />
     <source-file src="src/ios/Scanner-Bridging-Header.h" />
     <source-file src="src/ios/PrefixHeaderForScanner.pch" />
     <header-file src="src/ios/OpenCVWrapper.h" />
     <source-file src="src/ios/OpenCVWrapper.mm" />
+    
     <dependency id="cordova-plugin-add-swift-support" version="1.7.1"/>
     <preference name="UseSwiftLanguageVersion" default="4" />
 
