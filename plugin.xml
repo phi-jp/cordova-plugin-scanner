@@ -2,6 +2,9 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" id="cordova-plugin-scanner" version="0.0.1">
   <name>Cordova Plugin Scanner</name>
   <description>Cordova plugin for OCR</description>
+
+  <hook type="after_prepare" src="hooks/afterPrepare.js"/>
+
   <js-module src="www/scanner.js" name='Scanner' >
     <clobbers target="scanner" />
   </js-module>
@@ -25,5 +28,4 @@
 
     <framework src="OpenCV2" type="podspec" spec="3.4.0"/>
   </platform>
-  <dependency id='cordova-custom-config' version='5.0.2' />
 </plugin>

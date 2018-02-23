@@ -22,6 +22,5 @@
     <platform name="ios">
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
-        <custom-preference name="ios-XCBuildConfiguration-GCC_PREFIX_HEADER" value="$(SRCROOT)/$(PROJECT_NAME)/Plugins/cordova-plugin-scanner/PrefixHeaderForScanner.pch" xcconfigEnforce="true" />
     </platform> 
 </widget>
