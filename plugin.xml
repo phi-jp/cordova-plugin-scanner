@@ -28,7 +28,7 @@
     <header-file src="src/ios/Scanner-Bridging-Header.h" />
     <source-file src="src/ios/Scanner.swift" />
 
-    <edit-config target="Privacy - Camera Usage Description" file="*-Info.plist" mode="merge">
+    <edit-config target="NSCameraUsageDescription" file="*-Info.plist" mode="merge">
       <string>$CAMERA_USAGE_DESCRIPTION</string>
     </edit-config>
     
