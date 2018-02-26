@@ -10,7 +10,9 @@ class AVCapture:NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     
     var captureSession: AVCaptureSession!
     var delegate: AVCaptureDelegate?
-    
+    var isCapturing = true
+    var authorized = false
+    var initialized = false
     var counter = 0 //更に処理を少なくする
     
     override init(){
@@ -26,8 +28,45 @@ class AVCapture:NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         //AVCaptureSessionPreset640x480
         //AVCaptureSessionPresetLow
         
+        initDevice()
+        
+    }
+    func initDevice() {
+        if initialized {
+            return
+        }
+        let status = AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo)
+        switch status {
+        case AVAuthorizationStatus.authorized:
+            print("OKOKOK")
+            authorized = true
+        case AVAuthorizationStatus.denied:
+            print("denied")
+            fallthrough
+        case AVAuthorizationStatus.notDetermined:
+            print("notdeterminbed")
+            fallthrough
+
+        case AVAuthorizationStatus.restricted:
+            print("restricted")
+            authorized = false
+            return
+
+        }
+
         let videoDevice = AVCaptureDevice.defaultDevice(withMediaType: AVMediaTypeVideo) // カメラ
-        videoDevice?.activeVideoMinFrameDuration = CMTimeMake(1, 30)// 1/30秒 (１秒間に30フレーム)
+        do {
+            try videoDevice?.lockForConfiguration()
+            // FPS
+            videoDevice?.activeVideoMaxFrameDuration = CMTimeMake(1, 30)
+            videoDevice?.activeVideoMinFrameDuration = CMTimeMake(1, 30)
+            videoDevice?.unlockForConfiguration()
+        }
+        catch {
+            print("VIDEO DEVICE ERROR")
+        }
+        
+        
         
         let videoInput = try! AVCaptureDeviceInput.init(device: videoDevice)
         captureSession.addInput(videoInput)
@@ -42,6 +81,7 @@ class AVCapture:NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         //let videoConnection:AVCaptureConnection = (videoDataOutput.connection(withMediaType: AVMediaTypeVideo))!
         //videoConnection.videoOrientation = .portrait
         
+        initialized = true
     }
     
     func startRunning() {
@@ -54,11 +94,10 @@ class AVCapture:NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     
     // 新しいキャプチャの追加で呼ばれる(1/30秒に１回)
     func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
-//        if (counter % 5) == 0 {
+        if isCapturing {
             let image = imageFromSampleBuffer(sampleBuffer: sampleBuffer)
             delegate?.capture(image: image)
-//        }
-//        counter += 1
+        }
     }
     
     func imageFromSampleBuffer(sampleBuffer :CMSampleBuffer) -> UIImage {
