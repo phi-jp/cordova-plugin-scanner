@@ -85,11 +85,16 @@ class AVCapture:NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     }
     
     func startRunning() {
-        self.captureSession.startRunning()
+        if !captureSession.isRunning {
+            self.captureSession.startRunning()
+        }
+        
     }
     
     func stopRunning() {
-        self.captureSession.stopRunning()
+        if captureSession.isRunning {
+            self.captureSession.stopRunning()
+        }
     }
     
     // 新しいキャプチャの追加で呼ばれる(1/30秒に１回)
