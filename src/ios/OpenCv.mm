@@ -1,11 +1,11 @@
 
 
 #import <UIKit/UIKit.h>
-#import "Camera-Bridging-Header.h"
+#import "OpenCV-Bridging-Header.h"
 #import <opencv2/opencv.hpp>
 #import <opencv2/imgcodecs/ios.h>
 
-@implementation OpenCv : NSObject
+@implementation OpenCV : NSObject
 
 - (id) init {
     if (self = [super init]) {
@@ -55,6 +55,52 @@
     }
     
     return MatToUIImage(mat);
+}
+
+-(OpenCV *)ChangeImage:(UIImage *)image {
+    // 縦横を修正
+    UIGraphicsBeginImageContext(image.size);
+    [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height)];
+    _image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    
+    cv::Mat mat;
+    UIImageToMat(_image, mat);
+    _mat = mat;
+    return self;
+}
+
+-(OpenCV *)ImageThresholding {
+    cv::Mat gray;
+    // _mat を グレースケールにしたやつを gray に出力する
+    cv::cvtColor(_mat, gray, CV_BGR2GRAY);
+    // 閾値(0, 255)で画像を2値化
+    cv::threshold(gray, gray, 0, 255, cv::THRESH_BINARY|cv::THRESH_OTSU);
+    
+    return self;
+}
+-(OpenCV *)ThresholdBetween {
+    [self Threshold:0 maxval:255 type: cv::THRESH_BINARY|cv::THRESH_OTSU];
+    return self;
+}
+
+-(UIImage *)ToUIImage {
+    return MatToUIImage(_mat);
+}
+
+-(OpenCV *)ToGrayScale {
+    [OpenCV ToGrayScale:&_mat];
+    return self;
+}
+
++(void)ToGrayScale:(cv::Mat*) src {
+    // _mat を グレースケールにしたやつを gray に出力する
+    cv::cvtColor(*src, *src, CV_BGR2GRAY);
+}
+
+-(OpenCV *)Threshold:(double)thresh maxval:(double)maxval type:(int)type {
+    cv::threshold(_mat, _mat, thresh, maxval, type);
+    return self;
 }
 
 @end

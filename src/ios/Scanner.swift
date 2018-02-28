@@ -3,7 +3,7 @@ import AVFoundation
 
 @objc(Scanner) class Scanner: CDVPlugin, AVCaptureDelegate {
     var avCapture: AVCapture! = nil
-    var openCv: OpenCv! = nil
+    var openCv: OpenCV! = nil
     var base64 = ""
     var capturedImage: UIImage! = nil
     var lastSendImage: UIImage! = nil
@@ -12,7 +12,8 @@ import AVFoundation
     
     func capture(image: UIImage) {
         capturedImage = image
-        let datas:NSData = UIImageJPEGRepresentation(capturedImage!, 0.5)! as NSData
+        let filteredImage = openCv.changeImage(capturedImage).toGrayScale().thresholdBetween().toUIImage()
+        let datas:NSData = UIImageJPEGRepresentation(filteredImage!, 0.5)! as NSData
         base64 = "data:image/jpeg;base64," + datas.base64EncodedString()
         
         avCapture.isCapturing = false
@@ -30,7 +31,7 @@ import AVFoundation
     override func pluginInitialize() {
         avCapture = AVCapture()
         initDevice()
-        openCv = OpenCv()
+        openCv = OpenCV()
     }
     
     func initDevice(_ command: CDVInvokedUrlCommand! = nil) {

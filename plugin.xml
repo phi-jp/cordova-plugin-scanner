@@ -20,8 +20,8 @@
     </config-file>
     
     <source-file src="src/ios/AvCapture.swift" />
-    <header-file src="src/ios/Camera-Bridging-Header.h" />
-    <source-file src="src/ios/OpenCv.mm" />
+    <header-file src="src/ios/OpenCV-Bridging-Header.h" />
+    <source-file src="src/ios/OpenCV.mm" />
     <header-file src="src/ios/OpenCVWrapper.h" />
     <source-file src="src/ios/OpenCVWrapper.mm" />
     <source-file src="src/ios/PrefixHeaderForScanner.pch" />
