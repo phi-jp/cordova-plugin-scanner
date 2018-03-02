@@ -15,48 +15,6 @@
     return self;
 }
 
--(UIImage *)Filter:(UIImage *)image {
-    
-    // 方向を修正
-    UIGraphicsBeginImageContext(image.size);
-    [image drawInRect:CGRectMake(0, 0, image.size.width, image.size.height)];
-    image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    //UIImageをcv::Matに変換
-    cv::Mat mat;
-    UIImageToMat(image, mat);
-    cv::cvtColor(mat,mat,CV_BGR2GRAY);
-    
-    //Blur ぼかし
-    if(_useBlur) {
-        // kSizeは奇数のみ
-        int kSize = _blur0;
-        if(kSize % 2 == 0) {
-            kSize += 1;
-        }
-        cv::GaussianBlur(mat, mat, cv::Size(kSize,kSize), _blur1);
-    }
-    
-    // 閾値
-    if(_useThreshold) {
-        cv::threshold(mat, mat, 0, 255, cv::THRESH_BINARY|cv::THRESH_OTSU);
-    }
-    
-    // 適応閾値
-    if(_useAdaptiveThreshold) {
-        
-        // blockSizeは奇数のみ
-        int blockSize = _adaptiveThreshold0;
-        if(blockSize % 2 == 0) {
-            blockSize += 1;
-        }
-        cv::adaptiveThreshold(mat, mat, 255, cv::ADAPTIVE_THRESH_GAUSSIAN_C, cv::THRESH_BINARY, blockSize, _adaptiveThreshold1);
-    }
-    
-    return MatToUIImage(mat);
-}
-
 -(OpenCV *)ChangeImage:(UIImage *)image {
     // 縦横を修正
     UIGraphicsBeginImageContext(image.size);
