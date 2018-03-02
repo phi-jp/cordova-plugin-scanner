@@ -9,11 +9,28 @@ import AVFoundation
     var lastSendImage: UIImage! = nil
     var lastCallbackId:String! = nil
     var recordingFlag = false
+    var lastRects:[[[String: Float]]]! = []
     
     func capture(image: UIImage) {
         capturedImage = image
-        let filteredImage = openCv.changeImage(capturedImage).toGrayScale().thresholdBetween().toUIImage()
-        let datas:NSData = UIImageJPEGRepresentation(filteredImage!, 0.5)! as NSData
+        openCv
+            .changeImage(capturedImage)
+            .toGrayScale()
+            .thresholdBetween()
+        let rects = openCv.findContours()
+        lastRects = rects?.map({ points in
+            return (points as! NSArray).map({v in
+                let d = v as! NSDictionary
+                return [
+                    "x": (d["x"] as! NSNumber).floatValue,
+                    "y": (d["y"] as! NSNumber).floatValue
+                ]
+            })
+        })
+        
+//        let filteredImage = openCv.toUIImage()
+//        let datas:NSData = UIImageJPEGRepresentation(filteredImage!, 0.5)! as NSData
+        let datas:NSData = UIImageJPEGRepresentation(capturedImage!, 0.5)! as NSData
         base64 = "data:image/jpeg;base64," + datas.base64EncodedString()
         
         avCapture.isCapturing = false
@@ -21,7 +38,10 @@ import AVFoundation
     
     func sendLastImage(keepCallback: NSNumber) {
         lastSendImage = capturedImage
-        let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: base64 as String)
+        let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: [
+            "base64": base64 as String,
+            "rects": lastRects ?? []
+        ])
         result?.keepCallback = keepCallback
         commandDelegate.send(result, callbackId: lastCallbackId)
         avCapture.isCapturing = true

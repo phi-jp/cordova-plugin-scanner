@@ -12,6 +12,7 @@
 - (OpenCV *)ToGrayScale;
 - (OpenCV *)Threshold:(double)thresh maxval:(double)maxval type:(int)type;
 - (OpenCV *)ThresholdBetween;
+- (NSMutableArray<NSArray<NSDictionary<NSString*, NSNumber*>*>*>*)FindContours;
 
 @property bool useBlur;
 @property int blur0;
