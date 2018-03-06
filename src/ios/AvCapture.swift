@@ -13,7 +13,8 @@ class AVCapture:NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     var isCapturing = true
     var authorized = false
     var initialized = false
-    var counter = 0 //更に処理を少なくする
+    var takingPhoto = false
+    var lastBuffer: CMSampleBuffer!
     
     override init(){
         super.init()
@@ -21,7 +22,7 @@ class AVCapture:NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         captureSession = AVCaptureSession()
         
         // 解像度
-        captureSession.sessionPreset = AVCaptureSessionPreset640x480
+        captureSession.sessionPreset = AVCaptureSessionPreset1920x1080
         //AVCaptureSessionPresetMedium
         //AVCaptureSessionPreset1920x1080 1/5
         //AVCaptureSessionPreset1280x720 1/5
@@ -31,6 +32,7 @@ class AVCapture:NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         initDevice()
         
     }
+    
     func initDevice() {
         if initialized {
             return
@@ -38,17 +40,13 @@ class AVCapture:NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         let status = AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo)
         switch status {
         case AVAuthorizationStatus.authorized:
-            print("OKOKOK")
             authorized = true
         case AVAuthorizationStatus.denied:
-            print("denied")
             fallthrough
         case AVAuthorizationStatus.notDetermined:
-            print("notdeterminbed")
             fallthrough
 
         case AVAuthorizationStatus.restricted:
-            print("restricted")
             authorized = false
             return
 
@@ -58,8 +56,8 @@ class AVCapture:NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         do {
             try videoDevice?.lockForConfiguration()
             // FPS
-            videoDevice?.activeVideoMaxFrameDuration = CMTimeMake(1, 30)
-            videoDevice?.activeVideoMinFrameDuration = CMTimeMake(1, 30)
+            videoDevice?.activeVideoMaxFrameDuration = CMTimeMake(1, 15)
+            videoDevice?.activeVideoMinFrameDuration = CMTimeMake(1, 10)
             videoDevice?.unlockForConfiguration()
         }
         catch {
@@ -88,7 +86,6 @@ class AVCapture:NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         if !captureSession.isRunning {
             self.captureSession.startRunning()
         }
-        
     }
     
     func stopRunning() {
@@ -100,12 +97,17 @@ class AVCapture:NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
     // 新しいキャプチャの追加で呼ばれる(1/30秒に１回)
     func captureOutput(_ captureOutput: AVCaptureOutput!, didOutputSampleBuffer sampleBuffer: CMSampleBuffer!, from connection: AVCaptureConnection!) {
         if isCapturing {
-            let image = imageFromSampleBuffer(sampleBuffer: sampleBuffer)
+            lastBuffer = sampleBuffer
+            let image = imageFromSampleBuffer(sampleBuffer: sampleBuffer, scale: 1/3)
             delegate?.capture(image: image)
         }
     }
     
-    func imageFromSampleBuffer(sampleBuffer :CMSampleBuffer) -> UIImage {
+    func getLastImage(scale: CGFloat = 1.0) -> UIImage {
+        return imageFromSampleBuffer(sampleBuffer: lastBuffer, scale: scale)
+    }
+    
+    func imageFromSampleBuffer(sampleBuffer :CMSampleBuffer, scale: CGFloat = 1.0) -> UIImage {
         let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)!
         
         // イメージバッファのロック
@@ -125,8 +127,16 @@ class AVCapture:NSObject, AVCaptureVideoDataOutputSampleBufferDelegate {
         
         // 画像作成
         let imageRef = newContext.makeImage()!
-        let image = UIImage(cgImage: imageRef, scale: 1.0, orientation: UIImageOrientation.right)
+        var image = UIImage(cgImage: imageRef, scale: 1.0, orientation: UIImageOrientation.right)
         
+        if scale != 1.0 {
+            let resizedSize = CGSize(width: image.size.width * scale, height: image.size.height * scale)
+            
+            UIGraphicsBeginImageContext(resizedSize) // 変更
+            image.draw(in: CGRect(origin: .zero, size: resizedSize))
+            image = UIGraphicsGetImageFromCurrentImageContext()!
+            UIGraphicsEndImageContext()
+        }
         // イメージバッファのアンロック
         CVPixelBufferUnlockBaseAddress(imageBuffer, CVPixelBufferLockFlags(rawValue: 0))
         return image

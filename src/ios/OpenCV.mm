@@ -75,11 +75,13 @@
     std::vector<cv::Vec4i> hierarchy;
     cv::findContours(_mat, contours, hierarchy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE);
     NSMutableArray *rects = [[NSMutableArray alloc] init];
-    int max_level = 0;
+    int matAreaSize = _mat.size().width * _mat.size().height;
+    double minAreaSize = matAreaSize * 0.05;
+    double maxAreaSize = matAreaSize * 0.9;
     for(int i = 0; i < contours.size(); i++){
         // ある程度の面積が有るものだけに絞る
         double a = contourArea(contours[i],false);
-        if(a > 10000 && a < 300000) {
+        if(a > minAreaSize && a < maxAreaSize) {
             //輪郭を直線近似する
             std::vector<cv::Point> approx;
             
@@ -113,10 +115,95 @@
                                        }
                                    ]
                  ];
-                cv::drawContours(_mat, contours, i, cv::Scalar(255, 255, 255, 255), 20, CV_AA, hierarchy, max_level);
+                
+                // デバッグ用の描画
+//                cv::drawContours(_mat, contours, i, cv::Scalar(255, 255, 255, 255), 20, CV_AA, hierarchy, max_level);
             }
         }
     }
     return rects;
 }
+
+- (NSMutableArray<UIImage*>*)RectsToUIImages:(NSMutableArray<NSArray<NSDictionary<NSString*, NSNumber*>*>*>*)rects {
+    NSMutableArray<UIImage*>* images = [[NSMutableArray alloc] init];
+    cv::Mat image;
+    UIImageToMat(_image, image);
+    for (int i = 0; i < [rects count]; ++i) {
+        NSArray<NSDictionary<NSString*, NSNumber*>*>* rect = rects[i];
+        
+        cv::Point2f src[4]; // 変換元
+        cv::Point2f dst[4]; // 変換先
+        
+        // 0y が一番上の点で、左回りの想定
+        for (int i = 0; i < 4; ++i) {
+            src[i].x = [[rect objectAtIndex: i] objectForKey:@"x"].floatValue;
+            src[i].y = [[rect objectAtIndex: i] objectForKey:@"y"].floatValue;
+        }
+        // top left bottom right は ひし形 ◇ で考えたときの頂点の位置
+        double topLength = 0;
+        double bottomLength = 0;
+        double leftLength = 0;
+        double rightLength = 0;
+        
+        // 左上の辺が上のとき
+        int top = 0;
+        if (src[1].y > src[3].y) {
+            // 右上の辺が上の時
+            top = 3;
+        }
+        int left = (top + 1) % 4;
+        int bottom = (top + 2) % 4;
+        int right = (top + 3) % 4;
+        
+        topLength = sqrt(pow(src[top].x - src[left].x ,2) + pow(src[top].y - src[left].y ,2));
+        leftLength = sqrt(pow(src[left].x - src[bottom].x ,2) + pow(src[left].y - src[bottom].y ,2));
+        bottomLength = sqrt(pow(src[bottom].x - src[right].x ,2) + pow(src[bottom].y - src[right].y ,2));
+        rightLength = sqrt(pow(src[right].x - src[top].x ,2) + pow(src[right].y - src[top].y ,2));
+        double rate = 1;
+        
+        // サイズが大きい方に合わせる
+        if (topLength < bottomLength) {
+            rate = bottomLength / topLength;
+            topLength = bottomLength;
+        }
+        else {
+            rate = topLength / bottomLength;
+            bottomLength = topLength;
+        }
+        // 底辺と上の辺の斜め具合をかける
+        rightLength *= rate;
+        leftLength *= rate;
+        
+        if (rightLength < leftLength) {
+            rightLength = leftLength;
+        }
+        else {
+            leftLength = rightLength;
+        }
+        double width = topLength;
+        double height = leftLength;
+        
+        dst[left].x = 0;
+        dst[left].y = 0;
+        
+        dst[bottom].x = 0;
+        dst[bottom].y = height;
+        
+        dst[right].y = height;
+        dst[right].x = width;
+        
+        dst[top].x = width;
+        dst[top].y = 0;
+        
+        
+        cv::Mat mat;
+        // 透視変換行列を取得
+        cv::Mat perspective_matrix = cv::getPerspectiveTransform(src, dst);
+        // 変換
+        cv::warpPerspective(image, mat, perspective_matrix, cv::Size(width, height), cv::INTER_LINEAR);
+        [images addObject: MatToUIImage(mat)];
+    }
+    return images;
+}
+
 @end

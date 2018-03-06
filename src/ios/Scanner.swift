@@ -11,6 +11,8 @@ import AVFoundation
     var recordingFlag = false
     var lastRects:[[[String: Float]]]! = []
     
+    
+    // video
     func capture(image: UIImage) {
         capturedImage = image
         openCv
@@ -58,6 +60,7 @@ import AVFoundation
         avCapture.initDevice()
         if avCapture.authorized {
             avCapture.delegate = self
+            
             let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: "authorized")
             
             if command != nil {
@@ -103,6 +106,7 @@ import AVFoundation
         lastCallbackId = command.callbackId
         startInterval()
     }
+    
     func stop(_ command: CDVInvokedUrlCommand) {
         print("STOP!")
         
@@ -117,42 +121,25 @@ import AVFoundation
         self.commandDelegate.send(result, callbackId: command.callbackId)
     }
     
-    func scan(_ command: CDVInvokedUrlCommand) {
-        print("SCAN!")
-        
-        let filteredImage = capturedImage//openCv.filter(capturedImage)
-        //        let datas:NSData = UIImageJPEGRepresentation(filteredImage!, 0.5)! as NSData
-        
-        let datas:NSData = UIImagePNGRepresentation(filteredImage!)! as NSData
-        base64 = "data:image/jpeg;base64," + datas.base64EncodedString()
-        // 引数で何か渡されたら。
-        var someArg = command.argument(at: 0);
-        
-        if (someArg != nil) {
-            someArg = (someArg! as! String) + "+cordova!"
-        }
-        else {
-            someArg = "OK"
+    // 一旦変形画像を取得する関数として定義
+    func scan(_ command: CDVInvokedUrlCommand! = nil) {
+        if command != nil {
+            let cv = OpenCV().changeImage(avCapture.getLastImage()).toGrayScale().thresholdBetween();
+            
+            let images = cv?.rects(toUIImages: cv?.findContours())
+            let base64list = images?.map({ image -> String in
+                let datas:NSData = UIImageJPEGRepresentation(image as! UIImage, 1)! as NSData
+                return "data:image/jpeg;base64," + datas.base64EncodedString()
+            })
+            let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: base64list)
+            self.commandDelegate.send(result, callbackId: command.callbackId)
         }
         
-        // 結果を生成 (String)
-        let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: base64 as String)
-        // 結果を生成 (ArrayBuffer)
-//        let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAsArrayBuffer: datas as Data!)
-        
-        // エラーを送る場合
-        // let result = CDVPluginResult(status: CDVCommandStatus_Error, messageAs: "Error")
-
-        // 文字列以外も送れます
-        //  let result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: self.getSomeDict())
-
-        // 結果を送る
-        self.commandDelegate.send(result, callbackId: command.callbackId)
     }
     
     func startInterval() {
-        // 30 FPS
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1 / 30) {
+        // FPS
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1 / 15) {
             if self.lastCallbackId != nil && self.recordingFlag {
                 if self.lastSendImage != self.capturedImage {
                     self.sendLastImage(keepCallback: true)

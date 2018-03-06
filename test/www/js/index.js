@@ -55,12 +55,13 @@ document.addEventListener('deviceready', function() {
         style.left = elm.offsetLeft + 'px';
         style.top = elm.offsetTop + 'px';
         var c = canvas.getContext('2d');
-        
+        console.log(canvas.width)
         c.clearRect(0, 0, canvas.width, canvas.height);
         if (!rects.length) {
           return;
         }
         c.fillStyle = 'rgba(0, 0, 255, 0.4)';
+        console.log(rects)
         rects.forEach(function(rect) {
           c.beginPath();
           c.moveTo(rect[0].x, rect[0].y);
@@ -79,17 +80,24 @@ document.addEventListener('deviceready', function() {
     });
   };
 
-  // document.getElementById("scan").onclick = function() {
-  //   var now = Date.now();
-  //   scanner.scan(function(data) {
-  //     // console.log(data)
-  //     document.getElementById('time').textContent = Date.now() - now + 'ms';
-  //     // var elm = document.getElementById('img');
-  //     // elm.src = data;
-  //   }, function() {
-  //     alert('失敗');
-  //   }, '');
-  // };
+  document.getElementById("scan").onclick = function() {
+    var now = Date.now();
+    scanner.scan(function(datas) {
+      // console.log(data)
+      datas.forEach(function(data) {
+        document.getElementById('time').textContent = Date.now() - now + 'ms';
+        var elm = document.createElement('img');
+        elm.onload = function() {
+          console.log(this.naturalWidth, this.naturalHeight)
+        }
+        elm.src = data;
+        elm.style.width = '100%';
+        document.body.appendChild(elm);
+      });
+    }, function() {
+      alert('失敗');
+    }, '');
+  };
   
   document.getElementById("stop").onclick = function() {
     scanner.stop(function(data) {

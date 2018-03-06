@@ -5,7 +5,6 @@
 
 @interface OpenCV : NSObject
 
-- (UIImage *)Filter:(UIImage *)image;
 - (OpenCV *)ChangeImage:(UIImage *)image;
 - (OpenCV *)ImageThresholding;
 - (UIImage *)ToUIImage;
@@ -13,6 +12,7 @@
 - (OpenCV *)Threshold:(double)thresh maxval:(double)maxval type:(int)type;
 - (OpenCV *)ThresholdBetween;
 - (NSMutableArray<NSArray<NSDictionary<NSString*, NSNumber*>*>*>*)FindContours;
+- (NSMutableArray<UIImage*>*)RectsToUIImages:(NSMutableArray<NSArray<NSDictionary<NSString*, NSNumber*>*>*>*)rects;
 
 @property bool useBlur;
 @property int blur0;
