@@ -28,15 +28,6 @@
     return self;
 }
 
--(OpenCV *)ImageThresholding {
-    cv::Mat gray;
-    // _mat を グレースケールにしたやつを gray に出力する
-    cv::cvtColor(_mat, gray, CV_BGR2GRAY);
-    // 閾値(0, 255)で画像を2値化
-    cv::threshold(gray, gray, 0, 255, cv::THRESH_BINARY|cv::THRESH_OTSU);
-    
-    return self;
-}
 -(OpenCV *)ThresholdBetween {
     // TODO: 白いところをカット、黒いところをカットを変数化する
     

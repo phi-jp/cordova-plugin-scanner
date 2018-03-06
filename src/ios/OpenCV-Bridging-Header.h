@@ -6,7 +6,6 @@
 @interface OpenCV : NSObject
 
 - (OpenCV *)ChangeImage:(UIImage *)image;
-- (OpenCV *)ImageThresholding;
 - (UIImage *)ToUIImage;
 - (OpenCV *)ToGrayScale;
 - (OpenCV *)Threshold:(double)thresh maxval:(double)maxval type:(int)type;
