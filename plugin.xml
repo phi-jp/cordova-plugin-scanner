@@ -28,10 +28,6 @@
     <header-file src="src/ios/Scanner-Bridging-Header.h" />
     <source-file src="src/ios/Scanner.swift" />
 
-    <edit-config target="NSCameraUsageDescription" file="*-Info.plist" mode="merge">
-      <string>$CAMERA_USAGE_DESCRIPTION</string>
-    </edit-config>
-    
     <dependency id="cordova-plugin-add-swift-support" version="1.7.1"/>
     <preference name="UseSwiftLanguageVersion" default="4" />
 
